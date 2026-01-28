@@ -1,0 +1,7 @@
+Make a GUI,
+Send command to Actuator
+read the feedback
+
+[t,position]
+[t,position]
+[t,position]
