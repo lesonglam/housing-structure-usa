@@ -11,7 +11,7 @@ MAX_INCHES = 10.00
 # Clamp raw ADC to calibrated range
 # Measure these once by jogging to ends and reading live ADC
 ADC_MIN = 0      # example: fully retracted
-ADC_MAX = 460      # example: fully extended
+ADC_MAX =  460      # example: fully extended
 
 # Physical stroke length (inches)
 STROKE_INCHES = 10.0
@@ -24,7 +24,7 @@ CLAMP_ADC = True
 INVERT_POSITION = False
 
 # Control tolerance around target (inches)
-TOL_INCHES = 0.6
+TOL_INCHES = 0.1
 
 # How often the GUI/control loop updates (ms)
 GUI_POLL_MS = 50

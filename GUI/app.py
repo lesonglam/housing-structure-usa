@@ -182,9 +182,9 @@ class App(tk.Tk):
         self.prog_text.insert(
             "1.0",
             "# Example (absolute timestamps)\n"
-            "2.0, 3.00\n"
-            "30.0, 5.00\n"
-            "50.0, 3.0\n"
+            "2.0, 1.70\n"
+            "10.0, 2.20\n"
+            "20.0, 1.7\n"
         )
 
         btns = ttk.Frame(prog_frame)

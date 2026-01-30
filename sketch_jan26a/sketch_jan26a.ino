@@ -4,26 +4,25 @@
 #include "U8glib.h"
 
 // ---------------- Pins ----------------
-#define RLP1  A0
-#define RLP2  A1
-#define RLP3  A2
-#define RLP4  A3
+#define RLP1  6
+#define RLP2  7
+#define RLP3  4
+#define RLP4  5
 
-#define AD1   A4   // SDA (analog in)
-#define AD2   A5   // SCL (analog in)
+#define AD1   A0   // SDA (analog in)
+#define AD2   A1   // SCL (analog in)
 
 // Optional: keep if you need it for other hardware
-SoftwareSerial mySerial(7, 8);
+SoftwareSerial mySerial(0, 1);
 
-// LCD
-U8GLIB_ST7920_128X64_4X u8g(6, 5, 4);
+ 
 
 // --------- Actuator calibration ----------
 const int STROKE_IN_X100 = 1000;   // 10.00 inches = 1000 (x100)
 
 // Set these after measuring
 int adcMin = 0;       // ADC at fully retracted
-int adcMax = 1023;    // ADC at fully extended
+int adcMax = 460;    // ADC at fully extended
 
 // ---------------- Command / State ----------------
 enum DirState { DIR_STOP = 0, DIR_FWR = 1, DIR_REV = 2 };
@@ -130,33 +129,7 @@ void printTelemetryLine(int adc1, int adc2) {
 }
 
 // LCD: show direction + either ADC or inches
-void drawDisplay(int adc1, int adc2) {
-  int in1x100 = adcToInchesX100(adc1);
-  int in2x100 = adcToInchesX100(adc2);
-
-  char header[22];
-  char line1[22];
-  char line2[22];
-
-  snprintf(header, sizeof(header), "DIR: %s", dirToStr(dirState));
-
-  // You can swap to raw ADC if you prefer
-  // Example shows inches
-  snprintf(line1, sizeof(line1), "P1:%d.%02din A:%d",
-           in1x100 / 100, in1x100 % 100, adc1);
-
-  snprintf(line2, sizeof(line2), "P2:%d.%02din A:%d",
-           in2x100 / 100, in2x100 % 100, adc2);
-
-  u8g.firstPage();
-  do {
-    u8g.setFont(u8g_font_6x12);
-    u8g.drawStr(0, 14, "Actuator Telemetry");
-    u8g.drawStr(0, 30, header);
-    u8g.drawStr(0, 46, line1);
-    u8g.drawStr(0, 62, line2);
-  } while (u8g.nextPage());
-}
+ 
 
 // Handle a complete command line (trimmed, uppercased)
 // Commands:
@@ -236,8 +209,7 @@ void loop() {
   int adc1 = readAvg(AD1);
   int adc2 = readAvg(AD2);
 
-  // 3) LCD display
-  drawDisplay(adc1, adc2);
+ 
 
   // 4) Periodic telemetry stream (easy for Python to parse)
   unsigned long now = millis();
