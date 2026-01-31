@@ -125,6 +125,10 @@ class App(tk.Tk):
         self.after(config.GUI_POLL_MS, self._poll_serial)
         self.after(100, self._tick_clock)  # update PC clock + program timer
 
+
+        self._cmd_history = []  # Track last N commands
+        self._required_samples = 3  # Number of consecutive samples needed
+
     # ---------------- thread-safe UI helper ----------------
 
     def _ui_set(self, var: tk.StringVar, value: str):
@@ -324,14 +328,29 @@ class App(tk.Tk):
     def _get_position_in(self, t: Telemetry) -> float:
         adc, _mv = self._get_adc_mv(t)
         return adc_to_inches(adc)
+ 
 
     def _decide_cmd(self, pos_in: float, target_in: float) -> str:
         err = target_in - pos_in
         if err > config.TOL_INCHES:
-            return "FWR"
-        if err < -config.TOL_INCHES:
-            return "REV"
-        return "STOP"
+            cmd = "FWR"
+        elif err < -config.TOL_INCHES:
+            cmd = "REV"
+        else:
+            cmd = "STOP"
+
+        # Track command history
+        self._cmd_history.append(cmd)
+        if len(self._cmd_history) > self._required_samples:
+            self._cmd_history.pop(0)
+
+        # Only return command if all recent samples agree
+        if len(self._cmd_history) == self._required_samples and all(c == cmd for c in self._cmd_history):
+            return cmd
+        elif len(self._cmd_history) < self._required_samples:
+            return "STOP"  # Not enough samples yet
+        else:
+            return self._cmd_history[0]  # Keep previous command until threshold met
 
     def _maybe_send_cmd(self, cmd: str):
         now = time.time()
